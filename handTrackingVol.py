@@ -33,13 +33,6 @@ detector = htm.HandDetector(detectionCon=0.7, trackCon=0.7, maxHands=1)
 #####Volume Control Setup#####
 device = AudioUtilities.GetSpeakers()   #gets the speaker device
 volume = device.EndpointVolume          #assing an object called volume to allow volume control
-
-###############IGNORE#################
-#print(f"Audio output: {device.FriendlyName}")
-#print(f"- Muted: {bool(volume.GetMute())}")
-#print(f"- Volume level: {volume.GetMasterVolumeLevel()} dB")
-###############IGNORE#################
-
 VolRange = volume.GetVolumeRange()      #creates an object which has the volume range
 minVol = VolRange[0]
 maxVol = VolRange[1]
@@ -63,48 +56,12 @@ while True:
     #If the hand is detected by looking at the landmarks being present
     if len(lmList) != 0:
 
-        ### IGNORE THIS BIT FOR NOW####
-        #print(lmList[4], lmList[8])
-        #
-        # fingers = []  #Creates a list to store the open(1) and close(0) stage of the fingers
-        #
-        # #######detect movement of the thumb######
-        # ##the thumb movement is side to side - we get x values##
-        #
-        # if handType == "Right":
-        #     #checks to see if thumb tip is left of joint
-        #     if lmList[tipIds[0]][1] < lmList[tipIds[0] - 1][1]:
-        #         fingers.append(1)
-        #     else:
-        #         fingers.append(0)
-        #     #Checks to see if thumb tip is right of joint
-        # elif handType == "Left":
-        #     if lmList[tipIds[0]][1] > lmList[tipIds[0] - 1][1]:
-        #         fingers.append(1)
-        #     else:
-        #         fingers.append(0)
-        #
-        # #####detect movement of the other 4 fingers#####
-        # for id in range(1,5):
-        #     if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]: #checks to see if the y value of index is below the joint
-        #         fingers.append(1)
-        #     else:
-        #         fingers.append(0)
-        #
-        # ######IGNORE######
-        # # print(fingers)
-        # ######IGNORE######
-
 #gets the x and y co-ordinates of the thumb and index finger
         x1, y1 = lmList[4][1], lmList[4][2] #THUMB TIP
         x2, y2 = lmList[8][1], lmList[8][2] #INDEX TIP
 
 #finds the MIDPOINT of the line on x-axis and y-axis
         cx,cy = (x1+x2)//2, (y1+y2)//2
-
-
-##Im going to try a new approach to do the hand controlls - I will try to use hand size as a determinent of the finger movement
-##Ima do this, so I got a standardized measure for my calculation that does not change with the distance of the camera to the fingers
 
 ##Calculate the Hand size
 ##using distance between wrist(0) and middle finger (9)
@@ -137,40 +94,13 @@ while True:
 
 
 
-#draws a circle at index and thumb
+        #draws a circle at index and thumb
         cv2.circle(img, (x1, y1), 8, (155, 151, 232), cv2.FILLED)
         cv2.circle(img, (x2, y2), 8, (155, 151, 232), cv2.FILLED)
-#draws a line between the index and thumb points
+        #draws a line between the index and thumb points
         cv2.line(img, (x1, y1), (x2, y2), (232, 158, 206), 3)
-#draws a circle in the middle point of line of the thumb and index fingers
+        #draws a circle in the middle point of line of the thumb and index fingers
         cv2.circle(img, (cx, cy), 8, (155, 151, 232), cv2.FILLED)
-
-
-        ######NOTE#####
-        #Hange length range is from 150 to 20
-        #volume range is from -65 to 0
-
-        ###### Volume Control Gestures ######
-        # only active if the thumb is open, index is open and other fingers closed #
-        #volume change depending on the length of the line based on the minimum and max lenghth calibarions based on the max & low volume
-        ########if fingers[0] == 1 and fingers[1] == 1 and sum(fingers[2:]) == 0: #fuck this does not work
-
-            # Creates a length constraint for the max and mix lengths that can be recorded
-            #length = max(18, min(length,146))
-
-
-        # This method was somewhat bad as it was a very complicated to way to get a simple value
-        # # reference hand size
-        # x0, y0 = lmList[0][1], lmList[0][2]
-        # x9, y9 = lmList[9][1], lmList[9][2]
-        #
-        # handSize = max(1, math.hypot(x9 - x0, y9 - y0))
-        #
-        # normLength = length / handSize
-        # normLength = max(0.15, min(normLength, 0.8))
-        #print(int(length),vol)
-
-
 
 
     #volume bar
