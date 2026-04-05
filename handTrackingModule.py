@@ -2,9 +2,9 @@ import cv2   #import all the important libraries cv2 and mediapipe
 import mediapipe as mp
 import time
 
-class handDetector():
+class HandDetector:
     def __init__(self,mode=False,maxHands=2,detectionCon=0.5,trackCon=0.5 ):
-        self.mode = mode #object created and its the variable of this object
+        self.mode = mode #object created and it's the variable of this object
         self.maxHands = maxHands
         self.detectionCon = detectionCon
         self.trackCon = trackCon
@@ -39,7 +39,7 @@ class handDetector():
                     self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
         return img
 
-    def findPosition(self,img,handNo=0, draw = True):
+    def findPosition(self,img,handNo=0, draw = True, zAxis = False, color = (255, 0, 0)):
          # we get the landmark information - ID and Coordinates
 
         lmList = []
@@ -59,14 +59,19 @@ class handDetector():
                         #finding the cx and cy postion by multiplying the x and y values of the landmark
                 cx, cy = int(lm.x * w), int(lm.y * h)
 
-                        #find the ID located landmarks positions
-                # print(id, cx, cy)
-                lmList.append([id, cx, cy])
-                        #isolate one finger and highlight it depending on its landmark ID
+             # find the ID located landmarks positions
+                if zAxis:
+                    cz = round(lm.z, 3)
+                    lmList.append([id, cx, cy, cz])
+                else:
+                 # print(id, cx, cy)
+                    lmList.append([id, cx, cy])
+
+                #isolate one finger and highlight it depending on its landmark ID
                 #if id == 12:
                 #print(handType)
                 if draw:
-                    cv2.circle(img, (cx,cy), 6, (207, 109, 85), cv2.FILLED)
+                    cv2.circle(img, (cx,cy), 6, color, cv2.FILLED)
 
         return lmList, handType
 
@@ -75,7 +80,7 @@ def main() :
     cTime = 0
     # helps capture the footage seen by the laptop camera
     cap = cv2.VideoCapture(0)
-    detector = handDetector()
+    detector = HandDetector()
 
     # captures the camera
     while True:
@@ -96,7 +101,8 @@ def main() :
         cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 255), 3)
 
         cv2.imshow("Image", img)  # what does this do?
-        cv2.waitKey(1)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 
 if  __name__ == '__main__':

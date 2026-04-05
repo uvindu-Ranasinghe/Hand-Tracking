@@ -27,7 +27,7 @@ pTime = 0                   #creates a variable that has an assinged value to ca
 ######################################
 
 #####Creates a hand detector object######
-detector = htm.handDetector(detectionCon=0.8, maxHands=1)
+detector = htm.HandDetector(detectionCon=0.8, maxHands=1)
 
 ######################################
 
