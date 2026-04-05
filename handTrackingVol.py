@@ -6,10 +6,9 @@
 import cv2           #library that allows me to use the Camera and draw graphics
 import time          #Tool used to cal the FPS
 import numpy as np   #Math helper library
-from pycparser.c_ast import For
 import handTrackingModule as htm  #imports the hand tracking module I made as htm.
 import math           #Pre-built math functions
-from pycaw.pycaw import AudioUtilities  #Lets python control the volume - got this from GIT HUB
+from pycaw.pycaw import AudioUtilities  #Lets python control the volume - got this from GITHUB
 
 #####################################
 
@@ -27,7 +26,7 @@ pTime = 0                   #creates a variable that has an assinged value to ca
 ######################################
 
 #####Creates a hand detector object######
-detector = htm.HandDetector(detectionCon=0.8, maxHands=1)
+detector = htm.HandDetector(detectionCon=0.7, trackCon=0.7, maxHands=1)
 
 ######################################
 
@@ -59,47 +58,84 @@ tipIds = [4, 8, 12, 16, 20]
 while True:
     success, img = cap.read()   #capture image from webcam
     img = detector.findHands(img, draw=False)   #detects hand and does not draw it
-    lmList, handType = detector.findPosition(img, draw=True)  #gets the landmark list and the handType to find L or R hand
+    lmList, handType = detector.findPosition(img, draw=False)  #gets the landmark list and the handType to find L or R hand
 
     #If the hand is detected by looking at the landmarks being present
     if len(lmList) != 0:
+
+        ### IGNORE THIS BIT FOR NOW####
         #print(lmList[4], lmList[8])
+        #
+        # fingers = []  #Creates a list to store the open(1) and close(0) stage of the fingers
+        #
+        # #######detect movement of the thumb######
+        # ##the thumb movement is side to side - we get x values##
+        #
+        # if handType == "Right":
+        #     #checks to see if thumb tip is left of joint
+        #     if lmList[tipIds[0]][1] < lmList[tipIds[0] - 1][1]:
+        #         fingers.append(1)
+        #     else:
+        #         fingers.append(0)
+        #     #Checks to see if thumb tip is right of joint
+        # elif handType == "Left":
+        #     if lmList[tipIds[0]][1] > lmList[tipIds[0] - 1][1]:
+        #         fingers.append(1)
+        #     else:
+        #         fingers.append(0)
+        #
+        # #####detect movement of the other 4 fingers#####
+        # for id in range(1,5):
+        #     if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]: #checks to see if the y value of index is below the joint
+        #         fingers.append(1)
+        #     else:
+        #         fingers.append(0)
+        #
+        # ######IGNORE######
+        # # print(fingers)
+        # ######IGNORE######
 
-        fingers = []  #Creates a list to store the open(1) and close(0) stage of the fingers
-
-        #######detect movement of the thumb######
-        ##the thumb movement is side to side - we get x values##
-
-        if handType == "Right":
-            #checks to see if thumb tip is left of joint
-            if lmList[tipIds[0]][1] < lmList[tipIds[0] - 1][1]:
-                fingers.append(1)
-            else:
-                fingers.append(0)
-            #Checks to see if thumb tip is right of joint
-        elif handType == "Left":
-            if lmList[tipIds[0]][1] > lmList[tipIds[0] - 1][1]:
-                fingers.append(1)
-            else:
-                fingers.append(0)
-
-        #####detect movement of the other 4 fingers#####
-        for id in range(1,5):
-            if lmList[tipIds[id]][2] < lmList[tipIds[id]-2][2]: #checks to see if the y value of index is below the joint
-                fingers.append(1)
-            else:
-                fingers.append(0)
-
-        ######IGNORE######
-        # print(fingers)
-        ######IGNORE######
-
-#gets the x and y coodinates of the thumb and index finger
+#gets the x and y co-ordinates of the thumb and index finger
         x1, y1 = lmList[4][1], lmList[4][2] #THUMB TIP
         x2, y2 = lmList[8][1], lmList[8][2] #INDEX TIP
 
 #finds the MIDPOINT of the line on x-axis and y-axis
         cx,cy = (x1+x2)//2, (y1+y2)//2
+
+
+##Im going to try a new approach to do the hand controlls - I will try to use hand size as a determinent of the finger movement
+##Ima do this, so I got a standardized measure for my calculation that does not change with the distance of the camera to the fingers
+
+##Calculate the Hand size
+##using distance between wrist(0) and middle finger (9)
+        wX, wY = lmList[0][1], lmList[0][2]
+        mX, mY = lmList[9][1], lmList[9][2]
+        handSize = math.hypot(wX-mX, wY-mY)
+
+        ######Finds the distance between thumb and index#####
+        length = math.hypot(x2 - x1, y2 - y1)  # finds the hypotheneus to find the lenght of the line
+
+        ##Normalise the length
+        #nLen - rough #find number###
+        nLen = length / handSize
+
+        # sets the range for the volume in dp
+        vol = np.interp(nLen, [0.2, 1.3], [minVol, maxVol])  # -------------------------------------------------------
+        # sets the range for the volume that is being displayed
+        volBar = np.interp(nLen, [0.2, 1.3], [400, 200])
+        # perecentage convertion of volume
+        volPer = np.interp(nLen, [0.2, 1.3], [0, 100])
+
+    #applys the volume changes
+        volume.SetMasterVolumeLevel(vol, None)
+
+        # when the fingers touch it will create a button effect
+
+        if nLen < 0.2:
+            cv2.circle(img, (cx, cy), 8, (100, 100, 158), cv2.FILLED)
+
+
+
 
 #draws a circle at index and thumb
         cv2.circle(img, (x1, y1), 8, (155, 151, 232), cv2.FILLED)
@@ -109,9 +145,6 @@ while True:
 #draws a circle in the middle point of line of the thumb and index fingers
         cv2.circle(img, (cx, cy), 8, (155, 151, 232), cv2.FILLED)
 
-        ######Finds the distance between thumb and index#####
-        length = math.hypot(x2-x1, y2-y1) #finds the hypotheneus to find the lenght of the line
-        print(length)
 
         ######NOTE#####
         #Hange length range is from 150 to 20
@@ -125,34 +158,27 @@ while True:
             # Creates a length constraint for the max and mix lengths that can be recorded
             #length = max(18, min(length,146))
 
-        # reference hand size
-        x0, y0 = lmList[0][1], lmList[0][2]
-        x9, y9 = lmList[9][1], lmList[9][2]
 
-        handSize = max(1, math.hypot(x9 - x0, y9 - y0))
-
-        normLength = length / handSize
-        normLength = max(0.15, min(normLength, 0.8))
-
-        #sets the range for the volume in dp
-        vol = np.interp(length, [23, 146], [minVol, maxVol]) #-------------------------------------------------------
-        #sets the range for the volume that is being displayed
-        volBar = np.interp(length, [23, 146], [400, 200])
-        #perecentage convertion of volume
-        volPer = np.interp(length, [23, 146], [0, 100])
-
+        # This method was somewhat bad as it was a very complicated to way to get a simple value
+        # # reference hand size
+        # x0, y0 = lmList[0][1], lmList[0][2]
+        # x9, y9 = lmList[9][1], lmList[9][2]
+        #
+        # handSize = max(1, math.hypot(x9 - x0, y9 - y0))
+        #
+        # normLength = length / handSize
+        # normLength = max(0.15, min(normLength, 0.8))
         #print(int(length),vol)
-        volume.SetMasterVolumeLevel(vol, None)
-#when the fingers touch it will create a button effect
-        if length < 23:
-            cv2.circle(img, (cx, cy), 8, (232, 202, 158), cv2.FILLED)
+
+
+
 
     #volume bar
-        cv2.rectangle(img, (50, 200), (85, 400), (200, 202, 0), 2)
-        cv2.rectangle(img, (50, int(volBar)), (85, 400), (0, 202, 158), cv2.FILLED)
+    cv2.rectangle(img, (50, 200), (85, 400), (200, 202, 0), 2)
+    cv2.rectangle(img, (50, int(volBar)), (85, 400), (0, 202, 158), cv2.FILLED)
     #display the % of volume
-        cv2.putText(img, f' {int(volPer)} %', (42, 420), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 202, 158), 1)
-        cv2.putText(img, f'VOLUME', (40, 192), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (250,0,0), 1)
+    cv2.putText(img, f' {int(volPer)} %', (42, 420), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 202, 158), 1)
+    cv2.putText(img, f'VOLUME', (40, 192), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (250,0,0), 1)
 
     #FPS display
     cTime = time.time()
@@ -160,5 +186,7 @@ while True:
     pTime = cTime
     cv2.putText(img, f'FPS: {int(fps)}', (20,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (250,0,0), 1)
 
-    cv2.imshow("Image", img)
-    cv2.waitKey(1)
+    cv2.imshow("Volume Control", img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
