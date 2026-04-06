@@ -51,7 +51,7 @@ tipIds = [4, 8, 12, 16, 20]
 while True:
     success, img = cap.read()   #capture image from webcam
     img = detector.findHands(img, draw=False)   #detects hand and does not draw it
-    lmList, handType = detector.findPosition(img, draw=False)  #gets the landmark list and the handType to find L or R hand
+    lmList, handType = detector.findPosition(img, draw=True)  #gets the landmark list and the handType to find L or R hand
 
     #If the hand is detected by looking at the landmarks being present
     if len(lmList) != 0:
@@ -75,21 +75,36 @@ while True:
         ##Normalise the length
         #nLen - rough #find number###
         nLen = length / handSize
+        print(nLen)
 
         # sets the range for the volume in dp
-        vol = np.interp(nLen, [0.2, 1.3], [minVol, maxVol])  # -------------------------------------------------------
+        vol = np.interp(nLen, [0.1, 1.5], [minVol, maxVol])  # -------------------------------------------------------
         # sets the range for the volume that is being displayed
-        volBar = np.interp(nLen, [0.2, 1.3], [400, 200])
+        volBar = np.interp(nLen, [0.1, 1.5], [400, 200])
         # perecentage convertion of volume
-        volPer = np.interp(nLen, [0.2, 1.3], [0, 100])
+        volPer = np.interp(nLen, [0.1, 1.5], [0, 100])
+
+
+        ##Im going to try changing the volume changing method - currently its in floats it feels off. I will try volume
+        ##snapping this will be similar to a changing volume on a module knob
+
+        ##vol snapping
+        volIn = int(vol)
+        if volIn % 4 != 0:
+            volIn = volIn - (volIn % 4)
+
+        ##adding some safety bounds as boundaries
+        if volIn > 0: volIn = 0
+        if volIn < -64 : volIn = -64
+
 
     #applys the volume changes
-        volume.SetMasterVolumeLevel(vol, None)
+        volume.SetMasterVolumeLevel(volIn, None)
 
         # when the fingers touch it will create a button effect
 
-        if nLen < 0.2:
-            cv2.circle(img, (cx, cy), 8, (100, 100, 158), cv2.FILLED)
+        if nLen < 0.5:
+            cv2.circle(img, (cx, cy), 10, (100, 100, 158), cv2.FILLED)
 
 
 
