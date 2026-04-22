@@ -38,3 +38,10 @@ This means that I will be creating a way to use the windows OS without using a k
 I also focused on making the hanTrackingModule clean. This means I got rid of unecesary codes and comments. I also flipped the camera allowing me
 to get a mirrored representation of myself. This will allow me to properly identify left and right. 
 I have also implimented this in the handTrackingVolume project. 
+
+commit was called : Clean Code : Cleaned up the handTrackingModules code(refer to log), added a mirroring effect to my camera captures allowing me to have a mirroed look of my self throughout the project
+
+Log 5
+
+I am creating a new module called handGestureControl which will detect the fingers and recognize certian gestures. Depending on the gestures it will allow me to change different functions. Eg: scroll if my hand is pointing up or change volume if im pinching. 
+These changes are still to be determined. (more info will be added in later logs)
