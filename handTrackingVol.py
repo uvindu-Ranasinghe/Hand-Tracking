@@ -49,6 +49,9 @@ hMax = 1.5
 ####Creates a Loop for the Hand Tracking Volume Controller###
 while True:
     success, img = cap.read()
+    # flips the camera image horizontally - this is due to the fact that the image gets mirrored giving the perspective of the individual.
+    # It gives a mirrored image.
+    img = cv2.flip(img, 1)
     img = detector.findHands(img, draw=True)
     lmList, handType = detector.findPosition(img, draw=False)
 

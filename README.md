@@ -32,4 +32,9 @@ Log 3
 
 I finally manged to get the code to clearly work. The UI matches the volume changes. 
 
-
+Log 4 
+Delted the unecessary hand number count project. I will be pivoting my approach of this project to make windows OS more accesible for individuals. 
+This means that I will be creating a way to use the windows OS without using a keyboard or mouse. 
+I also focused on making the hanTrackingModule clean. This means I got rid of unecesary codes and comments. I also flipped the camera allowing me
+to get a mirrored representation of myself. This will allow me to properly identify left and right. 
+I have also implimented this in the handTrackingVolume project. 
