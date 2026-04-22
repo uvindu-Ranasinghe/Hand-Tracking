@@ -45,3 +45,7 @@ Log 5
 
 I am creating a new module called handGestureControl which will detect the fingers and recognize certian gestures. Depending on the gestures it will allow me to change different functions. Eg: scroll if my hand is pointing up or change volume if im pinching. 
 These changes are still to be determined. (more info will be added in later logs)
+
+Log 6
+
+I am going to try to merge clean-code with main on git. 
