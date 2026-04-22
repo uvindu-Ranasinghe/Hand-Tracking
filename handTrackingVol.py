@@ -42,14 +42,9 @@ vol = 0
 volBar = 400
 volPer = 0
 volumeLocked = True
-hMin = 0.1
+hMin = 0.2
 hMax = 1.5
-#min vol = -65.25
-#max vol = 0
 
-####MEDIAPIPE landmark IDS for the finger Tips#####
-#create a list for the fingers tips relating to its landmarks
-tipIds = [4, 8, 12, 16, 20]
 
 ####Creates a Loop for the Hand Tracking Volume Controller###
 while True:
@@ -89,10 +84,6 @@ while True:
 
         volume.SetMasterVolumeLevelScalar(volScalar, None)
 
-
-
-
-
         #draws a circle at index and thumb
         cv2.circle(img, (x1, y1), 8, (155, 151, 232), cv2.FILLED)
         cv2.circle(img, (x2, y2), 8, (155, 151, 232), cv2.FILLED)
@@ -102,8 +93,8 @@ while True:
         cv2.circle(img, (cx, cy), 8, (155, 151, 232), cv2.FILLED)
 
         # when the fingers touch it will create a button effect
-        if nLen < 0.5:
-             cv2.circle(img, (cx, cy), 10, (100, 100, 158), cv2.FILLED)
+        if nLen < 0.2:
+             cv2.circle(img, (cx, cy), 10, (100, 180, 170), cv2.FILLED)
 
 
     #volume bar
