@@ -49,3 +49,13 @@ These changes are still to be determined. (more info will be added in later logs
 Log 6
 
 I am going to try to merge clean-code with main on git. 
+
+Log 7 - created a new feature for the HandGestureControl module and created a new branch on git. 
+
+Log 8 
+
+Creating the logic to see if the hand is opened or closed. I will be using the x of the thumb as the thumb moves in the x direction 
+and y coordinates of rest of the fingers as they move horizontally. ____Limitation____ : this is making an assumption that hands will 
+be horizontally placed. Also added handType based detection to see if the thumb is open or closed. This will look 
+at thumb movement in the x-axis (horizontally) 
+

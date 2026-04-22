@@ -26,6 +26,12 @@ detector = hTM.HandDetector(detectionCon=0.6, trackCon=0.6, maxHands=1)
 
 ######################################
 
+### Variables ###
+tipIds = [4, 8, 12, 16, 20]
+mode = ''
+active = 0
+##################
+
 ####Creates a Loop for the Hand Tracking ###
 while True:
     success, img = cap.read()
@@ -34,6 +40,29 @@ while True:
     img = cv2.flip(img, 1)
     img = detector.findHands(img, draw=True)
     lmList, handType = detector.findPosition(img, draw=False)
+
+    print("Please keep your hand horizontally with your palm facing towards the camera")
+
+    fingers = []
+
+##Determines if hand is open or closed
+
+    # If the hand is detected by looking at the landmarks being present
+    if len(lmList) != 0:
+
+        #Thumb - Is Thumb Tip X >= Thumb Joint X?
+        #I need to concider both left and right hands - I will use handType to determine this and create the logic accordingly
+        if handType == "Right":
+            if lmList[0][1] > lmList[0][1]:
+                fingers.append(1)
+            else:
+                fingers.append(0)
+        elif handType == "Left":
+            if lmList[0][1] < lmList[0][1]:
+                fingers.append(1)
+            else:
+                fingers.append(0)
+
 
 
 
